@@ -1,6 +1,3 @@
-
-require 'pry'
-
 class Tree
     attr_accessor :array, :root
 
@@ -115,6 +112,33 @@ class Tree
         [height(node.left), height(node.right)].max + 1
     end
 
+    def depth(node, root = @root, dist = -1)
+        return -1 if root.nil?
+        return dist + 1 if root.data == node
+
+        dist = depth(node, root.left, dist)
+        return dist +1 if dist >= 0
+        dist = depth(node, root.right, dist)
+        return dist +1 if dist >= 0
+        
+        return dist   
+    end
+
+    def balanced?(root = @root)
+        return true if root.nil?
+        
+        l_height = height(root.left)
+        r_height = height(root.right)
+
+        return true if (l_height - r_height).abs <= 1 && balanced?(root.left) && balanced?(root.right)
+        
+        return false
+    end
+
+    def rebalance
+        @root = build_tree(inorder)
+    end
+
     def pretty_print(node = root, prefix = '', is_left = true)
         pretty_print(node.right, "#{prefix}#{is_left ? '│   ' : '    '}", false) if node.right
         puts "#{prefix}#{is_left ? '└── ' : '┌── '}#{node.data}"
@@ -134,12 +158,23 @@ class Node
 end
 
 
-# arr = (Array.new(15) { rand(1..100) })
 
-arr = [1, 2, 3, 4, 5, 6, 7]
-bst = Tree.new(arr)
+bst = Tree.new((Array.new(15) { rand(1..100) }))
 
-p bst.height(2)
+puts bst.balanced? == true ? "The tree is balanced" : "The tree is unbalanced"
+
+puts "\nLevel-order : #{bst.level_order} \nInorder : #{bst.inorder} 
+Preorder : #{bst.preorder} \nPostorder : #{bst.postorder}\n "
+
+10.times { bst.insert(rand(100..200)) }
+
+puts bst.balanced? == true ? "The tree is balanced" : "The tree is unbalanced \n "
+
+bst.rebalance
+
+puts bst.balanced? == true ? "The tree is balanced \n " : "The tree is unbalanced"
+
+puts "\nLevel-order : #{bst.level_order} \nInorder : #{bst.inorder} 
+Preorder : #{bst.preorder} \nPostorder : #{bst.postorder}\n "
 
 puts bst.pretty_print
-# p bst
